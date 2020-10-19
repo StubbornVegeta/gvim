@@ -1,142 +1,3 @@
-" The default vimrc file.
-"
-" Maintainer:   Bram Moolenaar <Bram@vim.org>
-" Last change:  2019 Oct 27
-"
-" This is loaded if no vimrc file was found.
-" Except when Vim is run with "-u NONE" or "-C".
-" Individual settings can be reverted with ":set option&".
-" Other commands can be reverted as mentioned below.
-
-" When started as "evim", evim.vim will already have done these settings.
-if v:progname =~? "evim"
-  finish
-endif
-
-" Bail out if something that ran earlier, e.g. a system wide vimrc, does not
-" want Vim to use these default values.
-if exists('skip_defaults_vim')
-  finish
-endif
-
-" Use Vim settings, rather than Vi settings (much better!).
-" This must be first, because it changes other options as a side effect.
-" Avoid side effects when it was already reset.
-if &compatible
-  set nocompatible
-endif
-
-" When the +eval feature is missing, the set command above will be skipped.
-" Use a trick to reset compatible only when the +eval feature is missing.
-silent! while 0
-  set nocompatible
-silent! endwhile
-
-" Allow backspacing over everything in insert mode.
-set backspace=indent,eol,start
-
-set history=200     " keep 200 lines of command line history
-set ruler       " show the cursor position all the time
-set showcmd     " display incomplete commands
-set wildmenu        " display completion matches in a status line
-
-set ttimeout        " time out for key codes
-set ttimeoutlen=100 " wait up to 100ms after Esc for special key
-
-" Show @@@ in the last line if it is truncated.
-set display=truncate
-
-" Show a few lines of context around the cursor.  Note that this makes the
-" text scroll if you mouse-click near the start or end of the window.
-set scrolloff=5
-
-" Do incremental searching when it's possible to timeout.
-if has('reltime')
-  set incsearch
-endif
-
-" Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it
-" confusing.
-set nrformats-=octal
-
-
-" Don't use Ex mode, use Q for formatting.
-" Revert with ":unmap Q".
-"map Q gq
-
-
-" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
-" so that you can undo CTRL-U after inserting a line break.
-" Revert with ":iunmap <C-U>".
-inoremap <C-U> <C-G>u<C-U>
-
-" In many terminal emulators the mouse works just fine.  By enabling it you
-" can position the cursor, Visually select and scroll with the mouse.
-" Only xterm can grab the mouse events when using the shift key, for other
-" terminals use ":", select text and press Esc.
-if has('mouse')
-  if &term =~ 'xterm'
-    set mouse=a
-  else
-    set mouse=nvi
-  endif
-endif
-
-" Switch syntax highlighting on when the terminal has colors or when using the
-" GUI (which always has colors).
-if &t_Co > 2 || has("gui_running")
-  " Revert with ":syntax off".
-  syntax on
-
-  " I like highlighting strings inside C comments.
-  " Revert with ":unlet c_comment_strings".
-  let c_comment_strings=1
-endif
-
-" Only do this part when Vim was compiled with the +eval feature.
-if 1
-
-  " Enable file type detection.
-  " Use the default filetype settings, so that mail gets 'tw' set to 72,
-  " 'cindent' is on in C files, etc.
-  " Also load indent files, to automatically do language-dependent indenting.
-  " Revert with ":filetype off".
-  filetype plugin indent on
-
-  " Put these in an autocmd group, so that you can revert them with:
-  " ":augroup vimStartup | au! | augroup END"
-  augroup vimStartup
-    au!
-
-    " When editing a file, always jump to the last known cursor position.
-    " Don't do it when the position is invalid, when inside an event handler
-    " (happens when dropping a file on gvim) and for a commit message (it's
-    " likely a different one than last time).
-    autocmd BufReadPost *
-      \ if line("'\"") >= 1 && line("'\"") <= line("$") && &ft !~# 'commit'
-      \ |   exe "normal! g`\""
-      \ | endif
-
-  augroup END
-
-endif
-
-" Convenient command to see the difference between the current buffer and the
-" file it was loaded from, thus the changes you made.
-" Only define it when not defined already.
-" Revert with: ":delcommand DiffOrig".
-if !exists(":DiffOrig")
-  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-          \ | wincmd p | diffthis
-endif
-
-if has('langmap') && exists('+langremap')
-  " Prevent that the langmap option applies to characters that result from a
-  " mapping.  If set (default), this may break plugins (but it's backward
-  " compatible).
-  set nolangremap
-endif
-
 " ============================================================================
 "     ██╗   ██╗███████╗ ██████╗ ███████╗████████╗ █████╗
 "     ██║   ██║██╔════╝██╔════╝ ██╔════╝╚══██╔══╝██╔══██╗
@@ -152,7 +13,6 @@ Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle'}
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }}
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'xuhdev/vim-latex-live-preview', {'for':'tex'}
-Plug 'xuhdev/SingleCompile'
 Plug 'vim-latex/vim-latex', {'for':'tex'}
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
@@ -163,11 +23,7 @@ Plug 'preservim/nerdcommenter'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'gko/vim-coloresque', {'for':'css'}
-"Plug 'morhetz/gjuvbox'
-"Plug 'vim-airline/vim-airline'
-"Plug 'vim-airline/vim-airline-themes'
 Plug 'itchyny/lightline.vim'
-"Plug 'liuchengxu/vista.vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'mhinz/vim-startify'
 Plug 'Yggdroot/indentLine'
@@ -175,6 +31,7 @@ Plug 'sillybun/vim-repl'
 Plug 'easymotion/vim-easymotion'
 Plug 'itchyny/vim-cursorword'
 Plug 'joshdick/onedark.vim'
+Plug 'vim-python/python-syntax'
 call plug#end()
 
 "set background=dark
@@ -265,8 +122,8 @@ map s <nop>
 " 保存
 nmap S :w<CR>
 " 退出
-map Q :bdelete<CR>
-nmap <C-q> :q<CR>
+map Q :q<CR>
+"nmap <C-q> :q<CR>
 " 右分屏，聚焦右窗口
 map sl :set splitright<CR>:vsplit<CR>:cd %:h<CR>
 " 左分屏，聚焦左窗口
@@ -308,7 +165,7 @@ map t- :-tabnext<CR>
 " 后一标签页
 map t= :+tabnext<CR>
 " 重新加载vim配置文件
-map rc :source D:\Program Files (x86)\Vim\_vimrc<CR>:nohlsearch<CR>
+map rc :source ~\.vim\init.vim<CR>:nohlsearch<CR>
 " 寻找两个相等的单词
 map <LEADER>fd /\(\<\w\+\>\)\_s*\1
 " 替换占空符<++>
@@ -316,7 +173,7 @@ map <LEADER><LEADER> <ESC>/<++><CR>:nohlsearch<CR>c4l
 " 全选
 nmap <C-a> ggVG
 " 打开我的vimrc
-map <LEADER>rc :e D:\Program Files (x86)\Vim\vim82\defaults.vim<CR>
+map <LEADER>rc :e ~\.vim\init.vim<CR>
 " 复制到系统剪切板
 map +y "+y
 " 从系统剪切板粘贴
@@ -328,7 +185,7 @@ nnoremap ^ 0
 
 
 nmap <LEADER>t :rightbelow vert term powershell<CR>
-nmap <LEADER>p :D:\python\Python36-32\python.exe
+"nmap <LEADER>p :D:\python\Python36-32\python.exe
 autocmd filetype tex noremap <buffer> <LEADER>i :!D:\python\Python36-32\python.exe D:\scripts\pdf2img.py -i %<.pdf -f %:h -o %<<CR>
 
 map <LEADER>m :TableModeToggle<CR>
@@ -341,11 +198,11 @@ set list
 set listchars=tab:>-,trail:-
 set shortmess-=S
 
-set backupdir=D:\Program\ Files\ (x86)\Vim\vim82\tmp\backup,.
-set directory=D:\Program\ Files\ (x86)\Vim\vim82\tmp\backup,.
+set backupdir=D:\Program\ Files\ (x86)\gvim\vim82\tmp\backup,.
+set directory=D:\Program\ Files\ (x86)\gvim\vim82\tmp\backup,.
 if has('persistent_undo')
     set undofile
-    set undodir=D:\Program\ Files\ (x86)\Vim\vim82\tmp\undo,.
+    set undodir=D:\Program\ Files\ (x86)\gvim\vim82\tmp\undo,.
 endif
 
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
@@ -370,9 +227,9 @@ let g:airline_powerline_fonts = 1
 "nmap [b :bn<CR>
 
 "nnoremap <silent> tl :ls<CR>
-nnoremap <silent> tn :enew<CR>
-nnoremap <silent> <leader>] :bnext<CR>
-nnoremap <silent> <leader>[ :bprevious<CR>
+nnoremap <silent> tn :tabnew<CR>
+nnoremap <silent> <leader>] :tabnext<CR>
+nnoremap <silent> <leader>[ :tabprevious<CR>
 "nnoremap <silent> tw :bdelete<CR>
 
 
@@ -458,44 +315,6 @@ command! -bang -nargs=* Buffers
 command! -bang -nargs=* MRU call fzf#vim#history()
 
 " ========
-" ======== Vista.vim
-" ========
-"noremap <LEADER>v :Vista coc<CR>
-"noremap <S-t> :silent! Vista finder coc<CR>
-"let g:vista_icon_indent = ["╰─ ", "├─ "]
-"let g:vista_default_executive = 'ctags'
-""let g:vista_fzf_preview = ['right:50%']
-"let g:vista#renderer#enable_icon = 1
-"let g:vista#renderer#icons = {
-"\    "function":      "\uf794",
-"\    "method":        "\uf6a6",
-"\    "variable":      "\uf71b",
-"\    "constant":      "\uf8ff",
-"\    "struct":        "\ufb44",
-"\    "class":         "\uf0e8",
-"\    "interface":     "\ufa52",
-"\    "text":          "\ue612",
-"\    "enum":          "\uf435",
-"\    "enumMember":    "\uf02b",
-"\    "module":        "\uf668",
-"\    "color":         "\ue22b",
-"\    "property":      "\ufab6",
-"\    "field":         "\uf93d",
-"\    "unit":          "\uf475",
-"\    "file":          "\uf471",
-"\    "value":         "\uf8a3",
-"\    "event":         "\ufacd",
-"\    "folder":        "\uf115",
-"\    "keyword":       "\uf893",
-"\    "snippet":       "\uf64d",
-"\    "operator":      "\uf915",
-"\    "reference":     "\uf87a",
-"\    "typeParameter": "\uf278",
-"\    "default":       "\uf29c"
-"\  }
-
-
-" ========
 " ======== vim-easy-align
 " ========
 " Start interactive EasyAlign in visual mode (e.g. vipga)
@@ -525,7 +344,6 @@ map <leader>` :Startify<CR>
 " ========
 " ======== vim-repl
 " ========
-
 let g:repl_program = {
             \   'python': 'ipython',
             \   }
@@ -565,17 +383,6 @@ let g:Tex_ViewRule_pdf = 'D:\\SumatraPDF\\SumatraPDF.exe'
 let g:Tex_PromptedEnvironments = ''
 let g:Tex_MultipleCompileFormats = 'pdf'
 
-" ========
-" ======== SingleCompile
-" ========
-call SingleCompile#SetCompilerTemplate('tex', 'xelatex', 'XeLatex',
-            \ 'xelatex', '',
-            \ SingleCompile#GetDefaultOpenCommand() .
-            \ ' "$(FILE_TITLE)$.pdf"')
-call SingleCompile#ChooseCompiler('tex', 'xelatex')
-"nmap <F6> :SCCompile<CR>:LLPStartPreview<CR>
-nmap <F10> :SCCompile<CR>:!D:\SumatraPDF\SumatraPDF.exe %<.pdf<CR>
-"imap <F6> <Esc>:SCCompile<CR>:LLPStartPreview<CR>
 
 " ========
 " ======== vim-latex-live-preview
@@ -678,6 +485,10 @@ let g:mkdp_page_title = '${name}'
 " ========
 nmap ss <Plug>(easymotion-s2)
 
+" ========
+" ======== python-syntax
+" ========
+let g:python_highlight_all = 1
 " ========
 " ======== runcode
 " ========
